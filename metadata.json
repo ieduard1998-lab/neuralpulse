@@ -1,0 +1,8 @@
+
+{
+  "name": "Pose Matcher: The Virtual Wall",
+  "description": "An interactive body-motion game where you must mimic poses to fit through approaching walls using Gemini-powered vision analysis.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

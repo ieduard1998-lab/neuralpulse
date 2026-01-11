@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Примеры поз - Neural Pulse</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #06b6d4, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .poses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .pose-card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 2px solid rgba(6, 182, 212, 0.2);
+            border-radius: 24px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pose-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #06b6d4, #22d3ee);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .pose-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(6, 182, 212, 0.5);
+            box-shadow: 0 20px 40px rgba(6, 182, 212, 0.2);
+        }
+
+        .pose-card:hover::before {
+            opacity: 1;
+        }
+
+        .pose-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            display: block;
+            text-align: center;
+            filter: drop-shadow(0 0 20px rgba(6, 182, 212, 0.5));
+        }
+
+        .pose-name {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            color: #f1f5f9;
+            text-align: center;
+        }
+
+        .pose-description {
+            color: #94a3b8;
+            line-height: 1.6;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        .instructions {
+            background: rgba(6, 182, 212, 0.1);
+            border: 2px solid rgba(6, 182, 212, 0.3);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+
+        .instructions h2 {
+            color: #06b6d4;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            font-weight: 800;
+        }
+
+        .instructions ul {
+            list-style: none;
+        }
+
+        .instructions li {
+            color: #cbd5e1;
+            margin-bottom: 0.8rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .instructions li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #06b6d4;
+            font-weight: bold;
+        }
+
+        .game-info {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 16px;
+            border: 1px solid rgba(6, 182, 212, 0.1);
+        }
+
+        .game-info p {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .poses-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .title {
+                font-size: 2.5rem;
+            }
+            
+            body {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">NEURAL PULSE</h1>
+            <p class="subtitle">Примеры поз для игры</p>
+        </div>
+
+        <div class="poses-grid">
+            <div class="pose-card">
+                <span class="pose-icon">👐</span>
+                <h3 class="pose-name">T-Pose</h3>
+                <p class="pose-description">Стоя прямо, вытяните обе руки горизонтально в стороны на уровне плеч.</p>
+            </div>
+
+            <div class="pose-card">
+                <span class="pose-icon">✌️</span>
+                <h3 class="pose-name">Victory V</h3>
+                <p class="pose-description">Поднимите обе руки высоко вверх, образуя широкую букву V над головой.</p>
+            </div>
+
+            <div class="pose-card">
+                <span class="pose-icon">🦸</span>
+                <h3 class="pose-name">Hero Pose</h3>
+                <p class="pose-description">Положите обе руки твёрдо на бёдра, локти направлены в стороны.</p>
+            </div>
+
+            <div class="pose-card">
+                <span class="pose-icon">🤯</span>
+                <h3 class="pose-name">Mind Blown</h3>
+                <p class="pose-description">Положите обе руки на верхнюю часть головы.</p>
+            </div>
+
+            <div class="pose-card">
+                <span class="pose-icon">🙋‍♂️</span>
+                <h3 class="pose-name">Reach High</h3>
+                <p class="pose-description">Поднимите только правую руку прямо вверх к небу.</p>
+            </div>
+
+            <div class="pose-card">
+                <span class="pose-icon">🙅</span>
+                <h3 class="pose-name">Power Pose</h3>
+                <p class="pose-description">Скрестите руки на груди.</p>
+            </div>
+
+            <div class="pose-card">
+                <span class="pose-icon">🙋‍♀️</span>
+                <h3 class="pose-name">Left Reach</h3>
+                <p class="pose-description">Поднимите только левую руку прямо вверх к небу.</p>
+            </div>
+
+            <div class="pose-card">
+                <span class="pose-icon">🙌</span>
+                <h3 class="pose-name">Touchdown</h3>
+                <p class="pose-description">Слегка согните колени и поднимите обе руки прямо вверх.</p>
+            </div>
+
+            <div class="pose-card">
+                <span class="pose-icon">�</span>
+                <h3 class="pose-name">Flying</h3>
+                <p class="pose-description">Стойте ногами на ширине плеч, руки раскинуты широко как крылья самолёта.</p>
+            </div>
+
+            <div class="pose-card">
+                <span class="pose-icon">🤔</span>
+                <h3 class="pose-name">Thinker</h3>
+                <p class="pose-description">Положите одну руку на подбородок/щёку, как будто глубоко задумались.</p>
+            </div>
+
+            <div class="pose-card">
+                <span class="pose-icon">🏋️</span>
+                <h3 class="pose-name">Sumo</h3>
+                <p class="pose-description">Сделайте неглубокое приседание с руками вместе перед грудью.</p>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h2>Как играть</h2>
+            <ul>
+                <li>Игра покажет вам одну из этих поз на экране</li>
+                <li>У вас есть 6 секунд, чтобы принять показанную позу</li>
+                <li>Система распознает вашу позу через камеру</li>
+                <li>За точное совпадение вы получаете очки</li>
+                <li>У вас есть 3 "единицы целостности" (жизни)</li>
+                <li>Игра заканчивается, когда вы теряете все жизни</li>
+                <li>Старайтесь匹配 позы как можно точнее для максимального счёта</li>
+            </ul>
+        </div>
+
+        <div class="game-info">
+            <p>Neural Pulse использует офлайн-нейронную обработку для распознавания поз в реальном времени</p>
+        </div>
+    </div>
+</body>
+</html>

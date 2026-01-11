@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pose Matcher: Neural Pulse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- MediaPipe Scripts - Pinned versions for stability -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5.1675469404/pose.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.3.1675466124/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.4.1675466862/camera_utils.js" crossorigin="anonymous"></script>
+    <style>
+      @keyframes tunnel {
+        from { transform: perspective(1000px) translateZ(-2000px); opacity: 0; }
+        to { transform: perspective(1000px) translateZ(200px); opacity: 1; }
+      }
+      .wall-animation {
+        animation: tunnel linear forwards;
+      }
+      body {
+        background-color: #020617;
+        margin: 0;
+        overflow: hidden;
+      }
+      .scanner-line {
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #06b6d4, transparent);
+        box-shadow: 0 0 15px #06b6d4;
+        position: absolute;
+        width: 100%;
+        top: 0;
+        z-index: 30;
+        animation: scan 3s linear infinite;
+      }
+      @keyframes scan {
+        0% { top: 0%; }
+        100% { top: 100%; }
+      }
+    </style>
+    <script type="importmap">
+    {
+      "imports": {
+        "react/": "https://esm.sh/react@^19.2.3/",
+        "react": "https://esm.sh/react@^19.2.3",
+        "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+        "@google/genai": "https://esm.sh/@google/genai@^1.35.0"
+      }
+    }
+    </script>
+  <link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

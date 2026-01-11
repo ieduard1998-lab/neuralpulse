@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ключевые точки поз - Neural Pulse</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem 0;
+            border-bottom: 2px solid rgba(6, 182, 212, 0.2);
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            color: #06b6d4;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-box {
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-box h3 {
+            color: #06b6d4;
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .info-box p {
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+
+        .poses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .pose-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9));
+            border: 2px solid rgba(6, 182, 212, 0.3);
+            border-radius: 20px;
+            padding: 1.5rem;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .pose-card:hover {
+            border-color: #06b6d4;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(6, 182, 212, 0.2);
+        }
+
+        .pose-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(6, 182, 212, 0.2);
+        }
+
+        .pose-icon {
+            font-size: 2.5rem;
+            filter: drop-shadow(0 0 10px rgba(6, 182, 212, 0.6));
+        }
+
+        .pose-name {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #f1f5f9;
+        }
+
+        .landmarks-list {
+            list-style: none;
+        }
+
+        .landmark-item {
+            background: rgba(15, 23, 42, 0.6);
+            padding: 0.8rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            border-left: 3px solid #06b6d4;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .landmark-key {
+            color: #06b6d4;
+            font-weight: bold;
+        }
+
+        .landmark-value {
+            color: #f1f5f9;
+        }
+
+        .landmark-condition {
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        .coordinates {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            margin-top: 0.3rem;
+            font-size: 0.8rem;
+        }
+
+        .coord {
+            background: rgba(6, 182, 212, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .legend {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .legend h3 {
+            color: #06b6d4;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        @media (max-width: 768px) {
+            .poses-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .coordinates {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">🎯 Ключевые точки поз</h1>
+            <p class="subtitle">Технические параметры для идеальных поз в Neural Pulse</p>
+        </div>
+
+        <div class="info-box">
+            <h3>📍 Система координат MediaPipe</h3>
+            <p>
+                Все координаты нормализованы от 0 до 1. Ось X: 0 (слева) до 1 (справа). 
+                Ось Y: 0 (верх) до 1 (низ). Видео зеркальное, поэтому лево/право инвертированы.
+            </p>
+        </div>
+
+        <div class="poses-grid">
+            <div class="pose-card">
+                <div class="pose-header">
+                    <span class="pose-icon">👐</span>
+                    <h3 class="pose-name">Т-Поза</h3>
+                </div>
+                <ul class="landmarks-list">
+                    <li class="landmark-item">
+                        <span class="landmark-key">Левая рука горизонтально:</span>
+                        <span class="landmark-value">|lWrist.y - lShoulder.y| < 0.15</span>
+                        <div class="coordinates">
+                            <div class="coord">lWrist.y ≈ lShoulder.y</div>
+                            <div class="coord">Допуск: ±0.15</div>
+                        </div>
+                    </li>
+                    <li class="landmark-item">
+                        <span class="landmark-key">Правая рука горизонтально:</span>
+                        <span class="landmark-value">|rWrist.y - rShoulder.y| < 0.15</span>
+                        <div class="coordinates">
+                            <div class="coord">rWrist.y ≈ rShoulder.y</div>
+                            <div class="coord">Допуск: ±0.15</div>
+                        </div>
+                    </li>
+                    <li class="landmark-item">
+                        <span class="landmark-key">Размах рук:</span>
+                        <span class="landmark-value">|lWrist.x - rWrist.x| > 0.4</span>
+                        <div class="coordinates">
+                            <div class="coord">Мин. ширина: 40%</div>
+                            <div class="coord">Центр: 0.5</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="pose-card">
+                <div class="pose-header">
+                    <span class="pose-icon">✌️</span>
+                    <h3 class="pose-name">Победа</h3>
+                </div>
+                <ul class="landmarks-list">
+                    <li class="landmark-item">
+                        <span class="landmark-key">Левая рука вверх:</span>
+                        <span class="landmark-value">lWrist.y < lShoulder.y - 0.2</span>
+                        <div class="coordinates">
+                            <div class="coord">Выше плеч на 20%</div>
+                            <div class="coord">Минимум: Y < 0.3</div>
+                        </div>
+                    </li>
+                    <li class="landmark-item">
+                        <span class="landmark-key">Правая рука вверх:</span>
+                        <span class="landmark-value">rWrist.y < rShoulder.y - 0.2</span>
+                        <div class="coordinates">
+                            <div class="coord">Выше плеч на 20%</div>
+                            <div class="coord">Минимум: Y < 0.3</div>
+                        </div>
+                    </li>
+                    <li class="landmark-item">
+                        <span class="landmark-key">Размах V:</span>
+                        <span class="landmark-value">|lWrist.x - rWrist.x| > 0.3</span>
+                        <div class="coordinates">
+                            <div class="coord">Мин. ширина: 30%</div>
+                            <div class="coord">Оптимально: 40-50%</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="pose-card">
+                <div class="pose-header">
+                    <span class="pose-icon">🦸</span>
+                    <h3 class="pose-name">Герой</h3>
+                </div>
+                <ul class="landmarks-list">
+                    <li class="landmark-item">
+                        <span class="landmark-key">Левая рука на бедре:</span>
+                        <span class="landmark-value">√((lWrist.x-lHip.x)² + (lWrist.y-lHip.y)²) < 0.2</span>
+                        <div class="coordinates">
+                            <div class="coord">Дист. до бедра < 0.2</div>
+                            <div class="coord">Радиус: 20% от кадра</div>
+                        </div>
+                    </li>
+                    <li class="landmark-item">
+                        <span class="landmark-key">Правая рука на бедре:</span>
+                        <span class="landmark-value">√((rWrist.x-rHip.x)² + (rWrist.y-rHip.y)²) < 0.2</span>
+                        <div class="coordinates">
+                            <div class="coord">Дист. до бедра < 0.2</div>
+                            <div class="coord">Радиус: 20% от кадра</div>
+                        </div>
+                    </li>
+                    <li class="landmark-item">
+                        <span class="landmark-key">Локти в стороны:</span>
+                        <span class="landmark-value">lElbow.x < lShoulder.x - 0.05 && rElbow.x > rShoulder.x + 0.05</span>
+                        <div class="coordinates">
+                            <div class="coord">Левый: X < плеча - 0.05</div>
+                            <div class="coord">Правый: X > плеча + 0.05</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="pose-card">
+                <div class="pose-header">
+                    <span class="pose-icon">🤯</span>
+                    <h3 class="pose-name">Шок</h3>
+                </div>
+                <ul class="landmarks-list">
+                    <li class="landmark-item">
+                        <span class="landmark-key">Левая рука у головы:</span>
+                        <span class="landmark-value">√((lWrist.x-nose.x)² + (lWrist.y-nose.y)²) < 0.25</span>
+                        <div class="coordinates">
+                            <div class="coord">Дист. до носа < 0.25</div>
+                            <div class="coord">Радиус: 25% от кадра</div>
+                        </div>
+                    </li>
+                    <li class="landmark-item">
+                        <span class="landmark-key">Правая рука у головы:</span>
+                        <span class="landmark-value">√((rWrist.x-nose.x)² + (rWrist.y-nose.y)²) < 0.25</span>
+                        <div class="coordinates">
+                            <div class="coord">Дист. до носа < 0.25</div>
+                            <div class="coord">Радиус: 25% от кадра</div>
+                        </div>
+                    </li>
+                    <li class="landmark-item">
+                        <span class="landmark-key">Руки выше плеч:</span>
+                        <span class="landmark-value">lWrist.y < lShoulder.y</span>
+                        <div class="coordinates">
+                            <div class="coord">Запястья выше плеч</div>
+                            <div class="coord">Y < Y плеча</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="pose-card">
+                <div class="pose-header">
+                    <span class="pose-icon">🙋‍♂️</span>
+                    <h3 class="pose-name">Правая вверх</h3>
+                </div>
+                <ul class="landmarks-list">
+                    <li class="landmark-item">
+                        <span class="landmark-key">Правая рука высоко:</span>
+                        <span class="landmark-value">rWrist.y < rShoulder.y - 0.3</span>
+                        <div class="coordinates">
+                            <div class="coord">Выше плеч на 30%</div>
+                            <div class="coord">Минимум: Y < 0.2</div>
+                        </div>
+                    </li>
+                    <li class="landmark-item">
+                        <span class="landmark-key">Левая рука низко:</span>
+                        <span class="landmark-value">lWrist.y > lShoulder.y</span>
+                        <div class="coordinates">
+                            <div class="coord">Ниже уровня плеч</div>
+                            <div class="coord">Y > Y плеча</div>
+                        </div>
+                    </li>
+                    <li class="landmark-item">
+                        <span class="landmark-condition">Контраст позы: правая вверх, левая вниз</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="pose-card">
+                <div class="pose-header">
+                    <span class="pose-icon">🙅</span>
+                    <h3 class="pose-name">Сила</h3>
+                </div>
+                <ul class="landmarks-list">
+                    <li class="landmark-item">
+                        <span class="landmark-key">Руки скрещены:</span>
+                        <span class="landmark-value">lWrist.x > rWrist.x</span>
+                        <div class="coordinates">
+                            <div class="coord">Зеркальное видео</div>
+                            <div class="coord">Левое > правое по X</div>
+                        </div>
+                    </li>
+                    <li class="landmark-item">
+                        <span class="landmark-key">Уровень рук:</span>
+                        <span class="landmark-value">|lWrist.y - lShoulder.y| < 0.3</span>
+                        <div class="coordinates">
+                            <div class="coord">Руки у груди</div>
+                            <div class="coord">Допуск: ±0.3</div>
+                        </div>
+                    </li>
+                    <li class="landmark-item">
+                        <span class="landmark-condition">В зеркальном видео левое запястье должно быть правее правого</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="pose-card">
+                <div class="pose-header">
+                    <span class="pose-icon">🙋‍♀️</span>
+                    <h3 class="pose-name">Левая вверх</h3>
+                </div>
+                <ul class="landmarks-list">
+                    <li class="landmark-item">
+                        <span class="landmark-key">Левая рука высоко:</span>
+                        <span class="landmark-value">lWrist.y < lShoulder.y - 0.3</span>
+                        <div class="coordinates">
+                            <div class="coord">Выше плеч на 30%</div>
+                            <div class="coord">Минимум: Y < 0.2</div>
+                        </div>
+                    </li>
+                    <li class="landmark-item">
+                        <span class="landmark-key">Правая рука низко:</span>
+                        <span class="landmark-value">rWrist.y > rShoulder.y</span>
+                        <div class="coordinates">
+                            <div class="coord">Ниже уровня плеч</div>
+                            <div class="coord">Y > Y плеча</div>
+                        </div>
+                    </li>
+                    <li class="landmark-item">
+                        <span class="landmark-condition">Контраст позы: левая вверх, правая вниз</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="pose-card">
+                <div class="pose-header">
+                    <span class="pose-icon">🙌</span>
+                    <h3 class="pose-name">Тачдаун</h3>
+                </div>
+                <ul class="landmarks-list">
+                    <li class="landmark-item">
+                        <span class="landmark-key">Обе руки вверх:</span>
+                        <span class="landmark-value">lWrist.y < lShoulder.y - 0.2 && rWrist.y < rShoulder.y - 0.2</span>
+                        <div class="coordinates">
+                            <div class="coord">Обе выше плеч на 20%</div>
+                            <div class="coord">Победа + приседание</div>
+                        </div>
+                    </li>
+                    <li class="landmark-item">
+                        <span class="landmark-condition">Сочетание победы с лёгким приседанием</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="pose-card">
+                <div class="pose-header">
+                    <span class="pose-icon">🦅</span>
+                    <h3 class="pose-name">Полёт</h3>
+                </div>
+                <ul class="landmarks-list">
+                    <li class="landmark-item">
+                        <span class="landmark-key">Руки в стороны:</span>
+                        <span class="landmark-value">|lWrist.y - lShoulder.y| < 0.15 && |rWrist.y - rShoulder.y| < 0.15</span>
+                        <div class="coordinates">
+                            <div class="coord">Горизонтально как Т-поза</div>
+                            <div class="coord">Допуск: ±0.15</div>
+                        </div>
+                    </li>
+                    <li class="landmark-item">
+                        <span class="landmark-key">Максимальный размах:</span>
+                        <span class="landmark-value">|lWrist.x - rWrist.x| > 0.5</span>
+                        <div class="coordinates">
+                            <div class="coord">Шире чем Т-поза</div>
+                            <div class="coord">Минимум: 50% ширины</div>
+                        </div>
+                    </li>
+                    <li class="landmark-item">
+                        <span class="landmark-condition">Ноги на ширине плеч, корпус слегка вперёд</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="pose-card">
+                <div class="pose-header">
+                    <span class="pose-icon">🤔</span>
+                    <h3 class="pose-name">Мыслитель</h3>
+                </div>
+                <ul class="landmarks-list">
+                    <li class="landmark-item">
+                        <span class="landmark-key">Рука у подбородка:</span>
+                        <span class="landmark-value">√((wrist.x-nose.x)² + (wrist.y-nose.y)²) < 0.2</span>
+                        <div class="coordinates">
+                            <div class="coord">Любая рука к носу</div>
+                            <div class="coord">Радиус: 20% от кадра</div>
+                        </div>
+                    </li>
+                    <li class="landmark-item">
+                        <span class="landmark-key">Вторая рука расслаблена:</span>
+                        <span class="landmark-value">otherWrist.y > otherShoulder.y</span>
+                        <div class="coordinates">
+                            <div class="coord">Вторая рука внизу</div>
+                            <div class="coord">Y > Y плеча</div>
+                        </div>
+                    </li>
+                    <li class="landmark-item">
+                        <span class="landmark-condition">Одна рука у лица, вторая расслаблена</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="pose-card">
+                <div class="pose-header">
+                    <span class="pose-icon">🏋️</span>
+                    <h3 class="pose-name">Сумоист</h3>
+                </div>
+                <ul class="landmarks-list">
+                    <li class="landmark-item">
+                        <span class="landmark-key">Руки перед грудью:</span>
+                        <span class="landmark-value">|lWrist.x - rWrist.x| < 0.2 && |lWrist.y - rWrist.y| < 0.2</span>
+                        <div class="coordinates">
+                            <div class="coord">Руки близко друг к другу</div>
+                            <div class="coord">Дист. < 0.2 по X и Y</div>
+                        </div>
+                    </li>
+                    <li class="landmark-item">
+                        <span class="landmark-key">Уровень рук:</span>
+                        <span class="landmark-value">lWrist.y > lShoulder.y && rWrist.y > rShoulder.y</span>
+                        <div class="coordinates">
+                            <div class="coord">Руки ниже плеч</div>
+                            <div class="coord">Y > Y плеча</div>
+                        </div>
+                    </li>
+                    <li class="landmark-item">
+                        <span class="landmark-condition">Приседание с соединёнными руками</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="legend">
+            <h3>📐 Обозначения точек MediaPipe</h3>
+            <div class="legend-grid">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #06b6d4;"></div>
+                    <span><strong>nose</strong> (0) - Нос</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #22d3ee;"></div>
+                    <span><strong>lShoulder</strong> (11) - Левое плечо</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #0ea5e9;"></div>
+                    <span><strong>rShoulder</strong> (12) - Правое плечо</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #0284c7;"></div>
+                    <span><strong>lElbow</strong> (13) - Левый локоть</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #0369a1;"></div>
+                    <span><strong>rElbow</strong> (14) - Правый локоть</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #075985;"></div>
+                    <span><strong>lWrist</strong> (15) - Левое запястье</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #0c4a6e;"></div>
+                    <span><strong>rWrist</strong> (16) - Правое запястье</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #164e63;"></div>
+                    <span><strong>lHip</strong> (23) - Левое бедро</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #155e75;"></div>
+                    <span><strong>rHip</strong> (24) - Правое бедро</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
